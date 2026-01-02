@@ -13,7 +13,7 @@ export class UsersController {
   }
 
   @Get('/list')
-  getUsers(): any[] {
+  getUsers(): ReadonlyArray<any> {
     return this.userService.getUsers();
   }
 }

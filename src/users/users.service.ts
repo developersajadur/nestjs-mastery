@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { USERS_DATA } from './user.data';
 
 @Injectable()
 export class UsersService {
@@ -6,11 +7,7 @@ export class UsersService {
     return 'Hello from UsersService';
   }
 
-  getUsers(): any[] {
-    return [
-      { id: 1, name: 'Alice', role: 'admin' },
-      { id: 2, name: 'Bob', role: 'user' },
-      { id: 3, name: 'Charlie', role: 'user' },
-    ];
+  getUsers(): ReadonlyArray<any> {
+    return USERS_DATA;
   }
 }
