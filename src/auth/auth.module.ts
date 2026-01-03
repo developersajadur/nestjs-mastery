@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from './auth.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    JwtModule.register({
-      //   secret: process.env.JWT_SECRET,
-      //   signOptions: { expiresIn: process.env.JWT_EXPIRES_IN as any },
-      secret: 'dev_secret_key_123',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.getOrThrow<string>('jwt.secret'),
+        signOptions: {
+          expiresIn: config.getOrThrow<string>('jwt.expiresIn') as any,
+        },
+      }),
     }),
   ],
   controllers: [AuthController],
