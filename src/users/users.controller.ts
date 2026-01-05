@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -23,5 +23,10 @@ export class UsersController {
   @Roles(Role.ADMIN)
   getUsers(): ReadonlyArray<any> {
     return this.userService.getUsers();
+  }
+
+  @Post('/create')
+  async createUser(@Req() req) {
+    return this.userService.createUser(req.body);
   }
 }
