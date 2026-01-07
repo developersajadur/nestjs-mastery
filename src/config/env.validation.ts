@@ -10,6 +10,7 @@ export const envSchema = z.object({
   JWT_SECRET: z.string().min(1),
   JWT_EXPIRES_IN: z.string().default('1d'),
   DATABASE_URL: z.string().min(1),
+  BYCRYPT_SALT_OR_ROUNDS: z.coerce.number(),
 
   //   DB_HOST: z.string().min(1),
   //   DB_PORT: z.coerce.number().default(5432),

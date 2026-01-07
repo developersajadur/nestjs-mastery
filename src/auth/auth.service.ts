@@ -1,17 +1,28 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { USERS_DATA } from 'src/users/user.data';
+import { comparePasswords } from 'src/common/password/password.bcrypt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly wtService: JwtService) {}
-  login(email: string, password: string): any {
-    const user = USERS_DATA.find((user) => user.email === email);
-
+  constructor(
+    private readonly wtService: JwtService,
+    private readonly userService: UsersService,
+  ) {}
+  async login(email: string, password: string): Promise<any> {
+    const user = await this.userService.getUserByEmailForLogin(email);
     if (!user) {
       throw new UnauthorizedException('User not found');
-    } else if (user.password !== password) {
+    } else if (user.isBlocked) {
+      throw new UnauthorizedException('User is blocked');
+    }
+
+    const isPasswordValid = await comparePasswords(password, user.password);
+    if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 

@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from './roles.guard';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RolesGuard } from './roles.guard';
         },
       }),
     }),
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, AuthGuard, RolesGuard],

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -6,16 +7,20 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { USERS_DATA } from 'src/users/user.data';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
-  canActivate(context: ExecutionContext): boolean {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UsersService,
+  ) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest();
     const token = req.headers.authorization;
 
@@ -26,12 +31,13 @@ export class AuthGuard implements CanActivate {
     try {
       const payload = this.jwtService.verify(token as string);
 
-      const isExistUser = USERS_DATA.find((user) => user.id === payload.userId);
+      const isExistUser = await this.userService.getUserDataById(payload.id);
 
       if (!isExistUser) {
-        throw new UnauthorizedException('Unauthorized');
+        throw new NotFoundException('User not found');
+      } else if (isExistUser.isBlocked) {
+        throw new UnauthorizedException('User is blocked');
       }
-
       (req as any).user = payload;
       return true;
     } catch (error: any) {

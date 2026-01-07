@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
@@ -6,6 +7,7 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/roles.enum';
+import { SafeUser } from './user.type';
 
 @Controller('users')
 export class UsersController {
@@ -18,11 +20,11 @@ export class UsersController {
     return req.user;
   }
 
-  @Get('/list')
+  @Get('/me')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  getUsers(): ReadonlyArray<any> {
-    return this.userService.getUsers();
+  getUserDataById(@Req() req): Promise<SafeUser | null> {
+    return this.userService.getUserDataById(req.user.id);
   }
 
   @Post('/create')
