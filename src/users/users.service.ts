@@ -9,22 +9,24 @@ import {
 import { SafeUser } from './user.type';
 import { hashPassword } from 'src/common/password/password.bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async createUser(user: any): Promise<SafeUser | any> {
-    const hashedPassword = hashPassword(user.password as string);
+    const hashedPassword = await hashPassword(user.password as string);
     return this.prisma.user.create({
       data: {
         ...user,
+        id: uuidv4(),
         password: hashedPassword,
       },
     });
   }
 
-  async getUserDataById(userId: number): Promise<SafeUser | null> {
+  async getUserDataById(userId: string): Promise<SafeUser | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {

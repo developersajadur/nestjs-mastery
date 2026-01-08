@@ -22,9 +22,9 @@ export class UsersController {
 
   @Get('/me')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  getUserDataById(@Req() req): Promise<SafeUser | null> {
-    return this.userService.getUserDataById(req.user.id);
+  @Roles(Role.ADMIN, Role.USER)
+  getMe(@Req() req): Promise<SafeUser | null> {
+    return req.user;
   }
 
   @Post('/create')

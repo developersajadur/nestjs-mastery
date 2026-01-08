@@ -2,7 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { comparePasswords } from 'src/common/password/password.bcrypt';
 import { UsersService } from 'src/users/users.service';
@@ -11,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 export class AuthService {
   constructor(
     private readonly wtService: JwtService,
+    @Inject(forwardRef(() => UsersService))
     private readonly userService: UsersService,
   ) {}
   async login(email: string, password: string): Promise<any> {

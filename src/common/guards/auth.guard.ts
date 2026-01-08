@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   CanActivate,
   ExecutionContext,
@@ -12,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { JwtUserPayload } from 'src/users/user.type';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -29,16 +28,18 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload = this.jwtService.verify(token as string);
+      const payload = this.jwtService.verify(token as string) as JwtUserPayload;
 
-      const isExistUser = await this.userService.getUserDataById(payload.id);
+      const isExistUser = await this.userService.getUserDataById(
+        payload.userId,
+      );
 
       if (!isExistUser) {
         throw new NotFoundException('User not found');
       } else if (isExistUser.isBlocked) {
         throw new UnauthorizedException('User is blocked');
       }
-      (req as any).user = payload;
+      (req as any).user = isExistUser;
       return true;
     } catch (error: any) {
       throw new UnauthorizedException('Invalid or expired token');
