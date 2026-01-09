@@ -30,6 +30,11 @@ export class AuthGuard implements CanActivate {
     try {
       const payload = this.jwtService.verify(token as string) as JwtUserPayload;
 
+      const time = Math.floor(Date.now() / 1000);
+      if (payload.exp < time) {
+        throw new UnauthorizedException('Token has expired');
+      }
+
       const isExistUser = await this.userService.getUserDataById(
         payload.userId,
       );
