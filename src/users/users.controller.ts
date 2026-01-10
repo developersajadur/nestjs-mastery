@@ -30,4 +30,19 @@ export class UsersController {
   async createUser(@Req() req) {
     return this.userService.createUser(req.body);
   }
+
+  @Get('/all')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAllUsers(): Promise<SafeUser[]> {
+    return this.userService.getAllUsers();
+  }
+
+  @Get('/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
+  async getUserById(@Req() req): Promise<SafeUser | null> {
+    const userId = req.params.id as string;
+    return this.userService.getUserDataById(userId);
+  }
 }

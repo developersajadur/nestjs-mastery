@@ -26,6 +26,20 @@ export class UsersService {
     });
   }
 
+  async getAllUsers(): Promise<SafeUser[]> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isBlocked: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   async getUserDataById(userId: string): Promise<SafeUser | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
